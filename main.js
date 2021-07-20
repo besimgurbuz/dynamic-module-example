@@ -14,38 +14,36 @@ root.innerHTML = `
 root.appendChild(checkbox);
 
 
-function checkboxClicked() {
+async function checkboxClicked() {
   enableButton = !enableButton;
   const div = document.createElement('div');
   div.id = 'say-hello';
   div.style.margin = '10px 0';
 
   if (enableButton) {
-    import('./button').then(({ default: ButtonElement }) => {
-      const button = new ButtonElement({ color: 'blue', label: 'Say Hello!', clickAction: clickEvent });
+    const { default: ButtonElement } = await import('./button');
+    const button = new ButtonElement({
+      color: 'blue', label: 'Say Hello!', clickAction: () => {
+        const divElement = document.createElement('div');
+        const helloText = document.createElement('h2');
+        const removeButton = new ButtonElement({
+          color: 'red', label: 'Remove', clickAction: () => {
+            root.removeChild(divElement)
+          }
+        });
 
-      button.render(div);
-      root.appendChild(div);
-    })
+        helloText.innerText = 'Hello!';
+        divElement.appendChild(helloText);
+        removeButton.render(divElement);
+        root.appendChild(divElement);
+      }
+    });
+
+    button.render(div);
+    root.appendChild(div);
 
   } else {
     const addedDiv = document.querySelector('#say-hello');
     root.removeChild(addedDiv);
   }
-}
-
-
-function clickEvent() {
-  const divElement = document.createElement('div');
-  const helloText = document.createElement('h2');
-  const removeButton = new ButtonElement({
-    color: 'red', label: 'Remove', clickAction: () => {
-      root.removeChild(divElement)
-    }
-  });
-
-  helloText.innerText = 'Hello!';
-  divElement.appendChild(helloText);
-  removeButton.render(divElement);
-  root.appendChild(divElement);
 }
